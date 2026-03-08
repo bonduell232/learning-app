@@ -1,0 +1,21 @@
+Colors
+Primary:#9333EA
+Accent:#9333EA
+Background:#060406
+Text Primary:#060406
+Link:#9CA3AF
+Fonts
+Manrope(body)
+Typography
+primary: Manrope
+heading: Manrope
+h1: 38.5px
+h2: 21px
+body: 12.25px
+Spacing
+Base Unit:4
+Border Radius:7px
+Personality
+Tone: modern
+Energy: medium
+Audience: web developers and designers

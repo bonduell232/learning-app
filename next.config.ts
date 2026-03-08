@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '22mb', // Max. 20MB Uploads + Overhead
+    },
+  },
+  serverExternalPackages: ['@google/genai'],
 };
 
 export default nextConfig;
