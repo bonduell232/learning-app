@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: '22mb', // Max. 20MB Uploads + Overhead
+      bodySizeLimit: '27mb', // Max. 25MB Uploads + Overhead
     },
   },
   serverExternalPackages: ['@google/genai'],

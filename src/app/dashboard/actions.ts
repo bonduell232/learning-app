@@ -1,8 +1,10 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { generateFlashcardsFromFile, generateFlashcardsFromText } from '@/utils/gemini'
+import { generateFlashcardsFromFile, generateFlashcardsFromText, generateFlashcardsFromCollection } from '@/utils/gemini'
 import { revalidatePath } from 'next/cache'
+import { getUserRole, checkLimit } from '@/utils/checkLimit'
+import { isEnabled } from '@/config/features'
 
 // Multimodal-fähige MIME-Typen, die Gemini direkt lesen kann
 const MULTIMODAL_TYPES: Record<string, string> = {
@@ -16,6 +18,13 @@ export async function generateFlashcards(documentId: string): Promise<{ deckId?:
     // 1. Authentifizierung
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) return { error: 'Nicht angemeldet.' }
+
+    // ── Freemium-Guard ───────────────────────────────────────────
+    const role = await getUserRole(supabase, user.id)
+    if (!isEnabled('flashcards', role)) return { error: 'FEATURE_DISABLED' }
+    const limit = await checkLimit(supabase, user.id, role, 'flashcards')
+    if (!limit.allowed) return { error: 'LIMIT_REACHED' }
+    // ─────────────────────────────────────────────────────────────
 
     // 2. Dokument aus DB laden
     const { data: doc, error: docError } = await supabase
@@ -36,30 +45,42 @@ export async function generateFlashcards(documentId: string): Promise<{ deckId?:
 
     if (existingDeck) return { deckId: existingDeck.id }
 
-    // 4. Datei aus Supabase Storage herunterladen
-    const { data: fileData, error: storageError } = await supabase.storage
-        .from('documents')
-        .download(doc.storage_path)
+    // 4. Datei(en) aus Supabase Storage herunterladen
+    let filesForGemini: { buffer: Buffer; mimeType: string; title: string }[] = []
 
-    if (storageError || !fileData) {
-        return { error: `Datei konnte nicht geladen werden: ${storageError?.message}` }
+    try {
+        if (doc.type === 'COLLECTION') {
+            const paths: string[] = JSON.parse(doc.storage_path)
+            filesForGemini = await Promise.all(paths.map(async (path, idx) => {
+                const { data, error } = await supabase.storage.from('documents').download(path)
+                if (error || !data) throw new Error(`Bild konnte nicht geladen werden (${path}): ${error?.message}`)
+                const buf = Buffer.from(await data.arrayBuffer())
+                const ext = path.split('.').pop()?.toLowerCase()
+                const mimeTag = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
+                return { buffer: buf, mimeType: mimeTag, title: `Seite ${idx + 1}` }
+            }))
+        } else {
+            const { data: fileData, error: storageError } = await supabase.storage.from('documents').download(doc.storage_path)
+            if (storageError || !fileData) return { error: `Datei konnte nicht geladen werden: ${storageError?.message}` }
+            const buf = Buffer.from(await fileData.arrayBuffer())
+            const ext = doc.storage_path.split('.').pop()?.toLowerCase()
+            const mimeTag = doc.type === 'PDF' ? 'application/pdf' : (ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg')
+            filesForGemini = [{ buffer: buf, mimeType: mimeTag, title: doc.title }]
+        }
+    } catch (e: any) {
+        return { error: `Storage-Fehler: ${e.message}` }
     }
-
-    const fileBuffer = Buffer.from(await fileData.arrayBuffer())
 
     // 5. Gemini aufrufen (Strategie je nach Dateityp)
     let flashcards
     try {
-        if (doc.type === 'PDF') {
-            flashcards = await generateFlashcardsFromFile(fileBuffer, 'application/pdf', doc.title)
-        } else if (doc.type === 'IMAGE') {
-            // MIME-Typ aus Dateiendung ableiten
-            const ext = doc.storage_path.split('.').pop()?.toLowerCase()
-            const imageMime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
-            flashcards = await generateFlashcardsFromFile(fileBuffer, imageMime, doc.title)
+        if (doc.type === 'COLLECTION') {
+            flashcards = await generateFlashcardsFromCollection(filesForGemini, doc.title)
+        } else if (doc.type === 'PDF' || doc.type === 'IMAGE') {
+            flashcards = await generateFlashcardsFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title)
         } else {
-            // Word/Präsentation: Rohtext aus Puffer extrahieren (einfache Textextraktion)
-            const rawText = fileBuffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
+            // Word/Präsentation: Rohtext aus Puffer extrahieren
+            const rawText = filesForGemini[0].buffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
             flashcards = await generateFlashcardsFromText(rawText, doc.title)
         }
     } catch (e: unknown) {

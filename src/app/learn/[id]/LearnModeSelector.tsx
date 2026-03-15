@@ -6,8 +6,9 @@ import { motion } from 'framer-motion'
 import { generateFlashcards } from '@/app/dashboard/actions'
 import { generateAudio } from '@/app/audio/actions'
 import { generateQuiz } from '@/app/quiz/actions'
-import { Headphones, Layers, Zap, Loader2, ChevronLeft, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Headphones, Layers, Zap, Loader2, ChevronLeft, Sparkles, ArrowRight, CheckCircle2, Lock } from 'lucide-react'
 import Link from 'next/link'
+import UpgradePrompt from '@/components/UpgradePrompt'
 
 interface Props {
     documentId: string
@@ -18,6 +19,10 @@ interface Props {
     existingAudioId: string | null
     existingQuizId: string | null
     existingQuizCount: number | null
+    /** Ob User das Limit für das jeweilige Feature bereits erreicht hat */
+    flashcardsLocked?: boolean
+    audioLocked?: boolean
+    quizLocked?: boolean
 }
 
 type Mode = 'podcast' | 'flashcards' | 'quiz'
@@ -37,12 +42,14 @@ export default function LearnModeSelector({
     const [isPending, startTransition] = useTransition()
     const [activeMode, setActiveMode] = useState<Mode | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [isLimitReached, setIsLimitReached] = useState(false)
+    const [limitFeature, setLimitFeature] = useState<'flashcards' | 'audio' | 'quiz' | undefined>()
     const [msgIdx, setMsgIdx] = useState(0)
 
     function startLoading(mode: Mode) {
         setActiveMode(mode)
         setError(null)
-        // Lade-Nachrichten rotieren
+        setIsLimitReached(false)
         const iv = setInterval(() => setMsgIdx(i => (i + 1) % MESSAGES.length), 2500)
         startTransition(async () => {
             let result: { error?: string; deckId?: string; audioId?: string; quizId?: string } = {}
@@ -57,7 +64,14 @@ export default function LearnModeSelector({
                 if (!result.error) router.push(`/quiz/${result.quizId}`)
             }
             clearInterval(iv)
-            if (result.error) { setError(result.error); setActiveMode(null) }
+            if (result.error === 'LIMIT_REACHED') {
+                setIsLimitReached(true)
+                setLimitFeature(mode === 'podcast' ? 'audio' : mode)
+                setActiveMode(null)
+            } else if (result.error) {
+                setError(result.error)
+                setActiveMode(null)
+            }
         })
     }
 
@@ -144,8 +158,11 @@ export default function LearnModeSelector({
                     </div>
                 )}
 
-                {/* Fehler */}
-                {error && (
+                {/* Fehler & Upgrade-Prompt */}
+                {isLimitReached && (
+                    <UpgradePrompt feature={limitFeature} />
+                )}
+                {error && !isLimitReached && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 mb-6 text-sm text-red-400">
                         {error}
                     </div>
@@ -167,7 +184,6 @@ export default function LearnModeSelector({
                                 <p className="text-white/50 text-sm mb-6 flex-1">{mode.desc}</p>
 
                                 {mode.existingHref ? (
-                                    // Bereits vorhanden → direkt navigieren
                                     <Link
                                         href={mode.existingHref}
                                         className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/15 text-white px-4 py-3 rounded-full text-sm font-semibold transition-all"
@@ -176,7 +192,6 @@ export default function LearnModeSelector({
                                         {mode.existingLabel}
                                     </Link>
                                 ) : (
-                                    // Noch nicht vorhanden → generieren
                                     <button
                                         onClick={() => startLoading(mode.id)}
                                         disabled={isPending}

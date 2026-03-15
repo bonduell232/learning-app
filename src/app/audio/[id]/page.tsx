@@ -15,12 +15,18 @@ export default async function AudioPage({ params }: Props) {
 
     const { data: audio } = await supabase
         .from('audio_summaries')
-        .select('*, documents(title)')
+        .select('id, title, script, audio_url')
         .eq('id', id)
         .eq('user_id', user.id)
         .single()
 
     if (!audio) notFound()
 
-    return <AudioPlayerClient script={audio.script} title={audio.title} />
+    return (
+        <AudioPlayerClient
+            script={audio.script}
+            title={audio.title}
+            audioUrl={audio.audio_url ?? null}
+        />
+    )
 }

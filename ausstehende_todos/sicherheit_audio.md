@@ -1,0 +1,1 @@
+- Audio-Bucket (audio-files) auf privat setzen und signierte URLs (Signed URLs) für den Player implementieren, um unbefugten Zugriff zu verhindern.
