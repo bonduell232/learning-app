@@ -10,13 +10,13 @@ export type Role = 'FREE' | 'PREMIUM'
 export const FEATURES = {
     upload: {
         /** Maximale Anzahl Dokumente */
-        maxFiles: { FREE: 1, PREMIUM: Infinity },
+        maxFiles: { FREE: 10, PREMIUM: Infinity },
     },
     flashcards: {
         /** Feature aktiv? */
         enabled: { FREE: true, PREMIUM: true },
         /** Maximale Anzahl Lernkarten-Decks */
-        maxDecks: { FREE: 1, PREMIUM: Infinity },
+        maxDecks: { FREE: 3, PREMIUM: Infinity },
     },
     audio: {
         enabled: { FREE: true, PREMIUM: true },
@@ -26,7 +26,7 @@ export const FEATURES = {
     quiz: {
         enabled: { FREE: true, PREMIUM: true },
         /** Maximale Anzahl Quizze */
-        maxQuizzes: { FREE: 1, PREMIUM: Infinity },
+        maxQuizzes: { FREE: 3, PREMIUM: Infinity },
     },
 } as const
 
