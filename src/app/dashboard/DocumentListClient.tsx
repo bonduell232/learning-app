@@ -86,41 +86,51 @@ export default function DocumentListClient({ filteredDocs, currentSubject, col }
                 const isSelected = selectedIds.has(doc.id)
 
                 return (
-                    <div key={doc.id} className={`flex flex-col sm:flex-row sm:items-center gap-3 border-l-2 ${col.accent} ${isSelected ? 'bg-white/[0.05]' : 'bg-white/[0.02]'} rounded-r-xl pl-4 pr-3 py-3 transition-colors`}>
-                        {/* Checkbox */}
-                        <div className="flex items-center self-start sm:self-auto mt-1 sm:mt-0">
-                            <div
-                                onClick={() => toggleSelect(doc.id)}
-                                className={`w-5 h-5 rounded flex items-center justify-center cursor-pointer border transition-colors ${isSelected ? 'bg-[#9333EA] border-[#9333EA]' : 'border-white/20 bg-white/5 hover:border-white/40'}`}
-                            >
-                                {isSelected && (
-                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                )}
+                    <div key={doc.id} className={`flex flex-col lg:flex-row lg:items-center gap-3 border-l-2 ${col.accent} ${isSelected ? 'bg-white/[0.05]' : 'bg-white/[0.02]'} rounded-r-xl pl-4 pr-3 py-3 transition-colors`}>
+                        {/* Checkbox & Textbereich gruppiert */}
+                        <div className="flex items-start lg:items-center gap-3 flex-1 min-w-0">
+                            {/* Checkbox */}
+                            <div className="flex items-center mt-0.5 lg:mt-0 shrink-0">
+                                <div
+                                    onClick={() => toggleSelect(doc.id)}
+                                    className={`w-5 h-5 rounded flex items-center justify-center cursor-pointer border transition-colors ${isSelected ? 'bg-[#9333EA] border-[#9333EA]' : 'border-white/20 bg-white/5 hover:border-white/40'}`}
+                                >
+                                    {isSelected && (
+                                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <div className="shrink-0">{TYPE_ICONS[doc.type] ?? <FileCode className="w-4 h-4 text-white/30" />}</div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <Link href={`/learn/${doc.id}`} className="text-white/80 hover:text-white text-sm font-medium truncate transition-colors group flex items-center gap-1">
+                                            {doc.title}
+                                            <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-50 shrink-0 hidden sm:block" />
+                                        </Link>
+                                        {doc.context_info && <span className="text-white/40 text-[10px] leading-tight truncate mt-0.5">{doc.context_info}</span>}
+                                    </div>
+                                </div>
+                                {/* Thema mit Umbenennen */}
+                                <div className="flex mt-1 sm:mt-0 shrink-0">
+                                    <span className={`text-xs border px-2 py-0.5 rounded-full flex items-center ${col.topicBadge}`}>
+                                        <TopicLabel subjectName={currentSubject} topicName={topicName} />
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <div className="shrink-0">{TYPE_ICONS[doc.type] ?? <FileCode className="w-4 h-4 text-white/30" />}</div>
-                            <div className="flex flex-col min-w-0 flex-1">
-                                <Link href={`/learn/${doc.id}`} className="text-white/80 hover:text-white text-sm font-medium truncate transition-colors group flex items-center gap-1">
-                                    {doc.title}
-                                    <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-50 shrink-0" />
-                                </Link>
-                                {doc.context_info && <span className="text-white/40 text-[10px] leading-tight truncate mt-0.5">{doc.context_info}</span>}
-                            </div>
-                            {/* Thema mit Umbenennen */}
-                            <span className={`shrink-0 text-xs border px-2 py-0.5 rounded-full flex items-center ${col.topicBadge}`}>
-                                <TopicLabel subjectName={currentSubject} topicName={topicName} />
-                            </span>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap mt-2 sm:mt-0">
+                        {/* Actions (auf Mobile eingerückt, auf Desktop rechts bündig) */}
+                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap lg:flex-nowrap pl-8 lg:pl-0 mt-1 lg:mt-0">
                             <ActionPill documentId={doc.id} mode="flashcards" href={deck ? `/deck/${deck.id}` : `/learn/${doc.id}`} active={!!deck} icon={<Layers className="w-3 h-3" />} label={deck ? `${deck.card_count} Karten` : 'Lernkarten'} color="purple" />
                             <ActionPill documentId={doc.id} mode="quiz" href={quiz ? `/quiz/${quiz.id}` : `/learn/${doc.id}`} active={!!quiz} icon={<Zap className="w-3 h-3" />} label={quiz ? `${quiz.question_count} Fragen` : 'Quiz'} color="amber" />
                             <ActionPill documentId={doc.id} mode="audio" href={audio ? `/audio/${audio.id}` : `/learn/${doc.id}`} active={!!audio} icon={<Headphones className="w-3 h-3" />} label={audio ? 'Podcast' : 'Audio'} color="blue" />
-                            <DeleteDocumentButton documentId={doc.id} title={doc.title} />
+                            <div className="ml-auto lg:ml-0">
+                                <DeleteDocumentButton documentId={doc.id} title={doc.title} />
+                            </div>
                         </div>
                     </div>
                 )

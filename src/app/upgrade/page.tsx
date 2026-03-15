@@ -17,7 +17,7 @@ export default function UpgradePage() {
                             Lern-Begleiter
                         </span>
                     </h1>
-                    <p className="text-white/50 text-lg">Starte jetzt kostenlos mit Kognitify.</p>
+                    <p className="text-white/50 text-lg">Starte jetzt kostenlos mit Pocklio.</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8 items-start">

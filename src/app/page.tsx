@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowRight, BookOpen, Brain, Sparkles, Upload, Zap } from 'lucide-react'
+import { ArrowRight, BookOpen, Brain, Rocket, Upload, Zap } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -24,23 +24,24 @@ export default function Home() {
 
       {/* Navigation Bar */}
       <nav className="fixed w-full z-50 top-0 bg-[#060406]/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#9333EA] rounded-xl flex items-center justify-center">
-              <Sparkles className="text-white w-6 h-6" />
+            <div className="w-10 h-10 bg-[#9333EA] rounded-xl flex items-center justify-center shrink-0">
+              <Rocket className="text-white w-5 h-5" />
             </div>
-            <span className="text-2xl font-bold tracking-tight">Kognitify</span>
+            {/* Auf sehr kleinen Bildschirmen ausblenden, damit Buttons Platz haben */}
+            <span className="text-xl sm:text-2xl font-bold tracking-tight hidden sm:block">Pocklio</span>
           </div>
           <div className="hidden md:flex gap-8 text-sm font-medium text-white/70">
             <Link href="#features" className="hover:text-white transition-colors">Features</Link>
             <Link href="#how-it-works" className="hover:text-white transition-colors">So funktioniert's</Link>
             <Link href="/upgrade" className="hover:text-white transition-colors">Preise</Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <Link href="/login" className="text-sm font-medium hover:text-[#9333EA] transition-colors">
               Anmelden
             </Link>
-            <Link href="/register" className="bg-[#9333EA] hover:bg-[#a855f7] text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:shadow-[0_0_20px_rgba(147,51,234,0.4)]">
+            <Link href="/register" className="bg-[#9333EA] hover:bg-[#a855f7] text-white px-3 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all hover:shadow-[0_0_20px_rgba(147,51,234,0.4)] whitespace-nowrap">
               Kostenlos starten
             </Link>
           </div>
@@ -58,9 +59,11 @@ export default function Home() {
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-[#9333EA]" />
-            <span className="text-sm font-medium text-white/80">Die Zukunft des Lernens ist da</span>
+          <motion.div variants={fadeInUp}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+              <Rocket className="w-4 h-4 text-[#9333EA]" />
+              <span className="text-sm font-medium text-white/80">Willkommen bei Pocklio</span>
+            </div>
           </motion.div>
 
           <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">

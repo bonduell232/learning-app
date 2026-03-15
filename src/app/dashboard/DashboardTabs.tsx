@@ -90,16 +90,16 @@ export default function DashboardTabs({ allDocs, filteredDocs, subjects, current
     return (
         <>
             {/* Top-Level Tabs (Material vs Lernraum) */}
-            <div className="flex gap-2 p-1 bg-white/[0.02] border border-white/10 rounded-full w-max mx-auto mb-10">
+            <div className="flex flex-col sm:flex-row gap-2 p-1 bg-white/[0.02] border border-white/10 rounded-3xl sm:rounded-full w-full sm:w-max mx-auto mb-6 sm:mb-10">
                 <button
                     onClick={() => setActiveTab('material')}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all ${activeTab === 'material' ? 'bg-[#9333EA] text-white shadow-[0_0_15px_rgba(147,51,234,0.3)]' : 'text-white/40 hover:text-white/80'}`}
+                    className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-sm font-bold transition-all ${activeTab === 'material' ? 'bg-[#9333EA] text-white shadow-[0_0_15px_rgba(147,51,234,0.3)]' : 'text-white/40 hover:text-white/80'}`}
                 >
                     <Folders className="w-4 h-4" /> Material & Quellen
                 </button>
                 <button
                     onClick={() => setActiveTab('learn')}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all ${activeTab === 'learn' ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'text-white/40 hover:text-white/80'}`}
+                    className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-sm font-bold transition-all ${activeTab === 'learn' ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'text-white/40 hover:text-white/80'}`}
                 >
                     <BookOpen className="w-4 h-4" /> Mein Lernraum
                 </button>

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { login } from '@/app/auth/actions'
 import Link from 'next/link'
-import { Sparkles, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
+import { Rocket, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
@@ -26,9 +26,9 @@ export default function LoginPage() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center justify-center gap-2 mb-10">
                     <div className="w-10 h-10 bg-[#9333EA] rounded-xl flex items-center justify-center">
-                        <Sparkles className="text-white w-6 h-6" />
+                        <Rocket className="text-white w-6 h-6" />
                     </div>
-                    <span className="text-2xl font-bold text-white tracking-tight">Kognitify</span>
+                    <span className="text-2xl font-bold text-white tracking-tight">Pocklio</span>
                 </Link>
 
                 {/* Card */}

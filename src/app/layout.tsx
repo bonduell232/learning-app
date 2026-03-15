@@ -8,7 +8,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Lern-App",
+  title: "Pocklio – Deine smarte Lern-App",
   description: "Die intelligente Lernplattform für das Gymnasium",
 };
 
