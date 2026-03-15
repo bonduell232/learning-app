@@ -45,6 +45,13 @@ export default async function DashboardLayout({
                         <Upload className="w-4 h-4 group-hover:text-[#9333EA] transition-colors" />
                         Hochladen
                     </Link>
+                    <Link
+                        href="/impressum"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group"
+                    >
+                        <span className="w-4 text-center group-hover:text-[#9333EA] transition-colors font-bold i">§</span>
+                        Impressum
+                    </Link>
                 </nav>
 
                 {/* User + Logout */}
@@ -83,6 +90,10 @@ export default async function DashboardLayout({
                         <Upload className="w-6 h-6 ml-0.5" />
                     </Link>
                 </div>
+                <Link href="/impressum" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-white transition-colors">
+                    <span className="text-xl h-5 leading-none">§</span>
+                    <span className="text-[10px] font-bold tracking-wide">Legal</span>
+                </Link>
                 <form action={logout}>
                     <button type="submit" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-red-400 transition-colors">
                         <LogOut className="w-5 h-5" />

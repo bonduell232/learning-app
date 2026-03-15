@@ -30,7 +30,7 @@ export default function Home() {
               <Rocket className="text-white w-5 h-5" />
             </div>
             {/* Auf sehr kleinen Bildschirmen ausblenden, damit Buttons Platz haben */}
-            <span className="text-xl sm:text-2xl font-bold tracking-tight hidden sm:block">Pocklio</span>
+            <span className="text-xl sm:text-2xl font-bold tracking-tight">Pocklio</span>
           </div>
           <div className="hidden md:flex gap-8 text-sm font-medium text-white/70">
             <Link href="#features" className="hover:text-white transition-colors">Features</Link>
@@ -185,6 +185,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Footer */}
+      <footer className="py-16 px-6 bg-[#060406] border-t border-white/5">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#9333EA] rounded-lg flex items-center justify-center shrink-0">
+              <Rocket className="text-white w-4 h-4" />
+            </div>
+            <span className="text-lg font-bold tracking-tight">Pocklio</span>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-8 text-sm text-white/40">
+            <Link href="/impressum" className="hover:text-white transition-colors">Impressum</Link>
+            <Link href="#" className="hover:text-white transition-colors">Datenschutz</Link>
+            <Link href="/upgrade" className="hover:text-white transition-colors">Preise</Link>
+          </div>
+          
+          <div className="text-sm text-white/25">
+            © {new Date().getFullYear()} Pocklio. Privatprojekt.
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
