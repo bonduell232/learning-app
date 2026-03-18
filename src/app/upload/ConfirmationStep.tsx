@@ -142,8 +142,8 @@ export default function ConfirmationStep({ looseFiles, imageGroups, rawImages, o
     return (
         <div className="space-y-8">
             <div className="text-center sm:text-left">
-                <p className="text-[#9333EA] text-sm font-semibold uppercase tracking-widest mb-2">Schritt 2 von 2</p>
-                <h2 className="text-3xl font-extrabold text-white mb-2">KI-Vorschläge prüfen</h2>
+                <p className="text-[#9333EA] text-sm font-semibold uppercase tracking-widest mb-3">Schritt 2 von 2</p>
+                <h2 className="text-3xl font-extrabold text-white mb-6">KI-Vorschläge prüfen</h2>
                 <p className="text-white/50 text-sm max-w-xl hidden sm:block">
                     Die KI hat zusammenhängende Bilder in Gruppen (Ordner) sortiert.
                     Du kannst Bilder per <strong className="text-white/80">Drag & Drop</strong> verschieben, falls etwas nicht passt!

@@ -80,7 +80,7 @@ export default function LearnModeSelector({
             id: 'podcast' as Mode,
             icon: <Headphones className="w-8 h-8" />,
             title: '🎧 Lernpodcast',
-            desc: 'Hör dir die wichtigsten Infos in Ruhe an – perfekt für unterwegs.',
+            desc: 'Lass dir die wichtigsten Inhalte zusammenfassen und vorlesen. Ideal, um nebenbei oder auf dem Schulweg zu lernen.',
             color: 'from-blue-500/20 to-blue-600/10',
             border: 'border-blue-500/30 hover:border-blue-400/60',
             glow: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]',
@@ -92,25 +92,25 @@ export default function LearnModeSelector({
             id: 'flashcards' as Mode,
             icon: <Layers className="w-8 h-8" />,
             title: '🃏 Lernkarten',
-            desc: `${existingDeckCount ? `${existingDeckCount} Karten` : 'Karten'} zum Üben und Wiederholen.`,
+            desc: `Die beste Methode, um Vokabeln und Fakten auswendig zu lernen. Wir erstellen dir automatisch Karteikarten aus deinem Text.`,
             color: 'from-purple-500/20 to-purple-600/10',
             border: 'border-purple-500/30 hover:border-purple-400/60',
             glow: 'hover:shadow-[0_0_30px_rgba(147,51,234,0.2)]',
             existingId: existingDeckId,
             existingHref: existingDeckId ? `/deck/${existingDeckId}` : null,
-            existingLabel: `${existingDeckCount} Karten üben`,
+            existingLabel: `${existingDeckCount ?? ''} Karten üben`,
         },
         {
             id: 'quiz' as Mode,
             icon: <Zap className="w-8 h-8" />,
             title: '⚡ Wissensblitz',
-            desc: 'Teste dein Wissen im Quiz mit Kombo-Punkten und Sternwertung!',
+            desc: 'Teste dein Wissen in einem schnellen Quiz. Beantworte Fragen zum Inhalt und knacke den Highscore!',
             color: 'from-amber-500/20 to-orange-600/10',
             border: 'border-amber-500/30 hover:border-amber-400/60',
             glow: 'hover:shadow-[0_0_30px_rgba(245,158,11,0.2)]',
             existingId: existingQuizId,
             existingHref: existingQuizId ? `/quiz/${existingQuizId}` : null,
-            existingLabel: `${existingQuizCount} Fragen spielen`,
+            existingLabel: `${existingQuizCount ?? ''} Fragen spielen`,
         },
     ]
 
@@ -136,8 +136,9 @@ export default function LearnModeSelector({
                             lernen?
                         </span>
                     </h1>
-                    <p className="text-white/50 text-sm">
-                        <span className="text-white/70 font-medium">{documentTitle}</span> wurde erfolgreich hochgeladen.
+                    <p className="text-white/60 text-sm max-w-xl mx-auto leading-relaxed">
+                        Super! <span className="text-white/80 font-bold">{documentTitle}</span> wurde erfolgreich vorbereitet.
+                        Entscheide jetzt, wie du heute lernen möchtest – die KI erstellt alles passgenau für dich.
                     </p>
                 </div>
 

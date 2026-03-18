@@ -46,8 +46,9 @@ export async function register(formData: FormData) {
     return { error: 'Registrierung fehlgeschlagen. Bitte versuche es erneut.' }
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  // Wenn Email-Bestätigung aktiv ist, gibt signUp einen User zurück, aber keine Session.
+  // Wir leiten nicht weiter, sondern geben Erfolg zurück, damit die UI die Meldung zeigt.
+  return { success: true }
 }
 
 export async function logout() {

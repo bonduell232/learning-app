@@ -10,6 +10,7 @@ const KLASSENSTUFEN = [5, 6, 7, 8, 9, 10, 11, 12, 13]
 export default function RegisterPage() {
     const [error, setError] = useState<string | null>(null)
     const [isPending, startTransition] = useTransition()
+    const [isEmailSent, setIsEmailSent] = useState(false)
 
     async function handleSubmit(formData: FormData) {
         setError(null)
@@ -27,8 +28,41 @@ export default function RegisterPage() {
 
         startTransition(async () => {
             const result = await register(formData)
-            if (result?.error) setError(result.error)
+            if (result?.error) {
+                setError(result.error)
+            } else if (result?.success) {
+                setIsEmailSent(true)
+            }
         })
+    }
+
+    if (isEmailSent) {
+        return (
+            <main className="min-h-screen bg-[#060406] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#9333EA]/15 blur-[120px] rounded-full pointer-events-none" />
+                <div className="relative z-10 w-full max-w-md text-center">
+                    <Link href="/" className="flex items-center justify-center gap-2 mb-10">
+                        <div className="w-10 h-10 bg-[#9333EA] rounded-xl flex items-center justify-center text-white text-2xl">🚀</div>
+                        <span className="text-2xl font-bold text-white tracking-tight">Pocklio</span>
+                    </Link>
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-10 backdrop-blur-sm">
+                        <div className="w-20 h-20 bg-[#9333EA]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Mail className="text-[#9333EA] w-10 h-10" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-white mb-4">Prüfe dein Postfach!</h1>
+                        <p className="text-white/60 mb-8 leading-relaxed">
+                            Wir haben dir einen Bestätigungslink gesendet. Klicke auf den Link in der E-Mail, um dein Konto zu aktivieren.
+                        </p>
+                        <Link
+                            href="/login"
+                            className="inline-flex items-center justify-center gap-2 w-full bg-[#9333EA] hover:bg-[#a855f7] text-white px-6 py-3.5 rounded-full font-bold text-sm transition-all"
+                        >
+                            Zum Login <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                </div>
+            </main>
+        )
     }
 
     return (

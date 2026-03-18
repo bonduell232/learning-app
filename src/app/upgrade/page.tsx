@@ -104,7 +104,7 @@ export default function UpgradePage() {
                                 Melde dich gerne bei uns und sichere dir einen Platz für das Premium-Modell!
                             </p>
                             <a
-                                href="mailto:bonduell232@gmx.de?subject=Interesse%20an%20Kognitify%20Premium"
+                                href="mailto:bonduell232@gmx.de?subject=Interesse%20an%20Pocklio%20Premium"
                                 className="flex items-center justify-center gap-2 w-full bg-[#9333EA]/20 hover:bg-[#9333EA]/40 border border-[#9333EA]/50 text-white px-5 py-3.5 rounded-full font-bold transition-all"
                             >
                                 <Mail className="w-4 h-4" /> Interesse anmelden

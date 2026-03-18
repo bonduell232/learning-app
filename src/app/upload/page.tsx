@@ -190,7 +190,7 @@ export default function UploadPage() {
     // ── Bestätigungs-Screen ───────────────────────────────────────
     if (phase === 'confirming' || phase === 'saving') {
         return (
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto pt-10 sm:pt-16">
                 {globalError && <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400 mb-4">{globalError}</div>}
                 <ConfirmationStep
                     looseFiles={analyzedLoose}
@@ -206,10 +206,10 @@ export default function UploadPage() {
     // ── Verarbeitungs-Screen ──────────────────────────────────────
     if (phase === 'processing') {
         return (
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto pt-10 sm:pt-16">
                 <div className="mb-8">
-                    <p className="text-[#9333EA] text-sm font-semibold uppercase tracking-widest mb-2">Schritt 1 von 2</p>
-                    <h2 className="text-3xl font-extrabold text-white mb-2">Dateien werden verarbeitet</h2>
+                    <p className="text-[#9333EA] text-sm font-semibold uppercase tracking-widest mb-3">Schritt 1 von 2</p>
+                    <h2 className="text-3xl font-extrabold text-white mb-6">Dateien werden verarbeitet</h2>
                     <p className="text-white/40 text-sm">Jede Datei wird einzeln hochgeladen und von der KI analysiert.</p>
                 </div>
 
@@ -271,10 +271,10 @@ export default function UploadPage() {
 
     // ── Dateiauswahl-Screen ───────────────────────────────────────
     return (
-        <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-                <p className="text-[#9333EA] text-sm font-semibold uppercase tracking-widest mb-2">Hochladen</p>
-                <h1 className="text-4xl font-extrabold text-white mb-3">Lernmaterial hochladen</h1>
+        <div className="max-w-2xl mx-auto pt-10 sm:pt-16 text-center sm:text-left">
+            <div className="mb-10">
+                <p className="text-[#9333EA] text-sm font-semibold uppercase tracking-widest mb-3">Hochladen</p>
+                <h1 className="text-4xl font-extrabold text-white mb-6">Lernmaterial hochladen</h1>
                 <p className="text-white/50">Mehrere Dateien gleichzeitig – die KI erkennt Fach und Thema automatisch.</p>
             </div>
 
