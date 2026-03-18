@@ -85,6 +85,9 @@ export default function RegisterPage() {
                                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#9333EA]/60 focus:ring-1 focus:ring-[#9333EA]/40 transition-all"
                                 />
                             </div>
+                            <p className="mt-2 text-[11px] text-white/40 leading-normal">
+                                Mindestens 8 Zeichen. Empfehlung: Nutze Groß-/Kleinschreibung, Zahlen und Sonderzeichen für maximale Sicherheit.
+                            </p>
                         </div>
 
                         {/* Passwort bestätigen */}
