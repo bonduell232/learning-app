@@ -185,8 +185,34 @@ export async function generatePodcastScriptFromText(
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────────
 
-const QUIZ_PROMPT = `Du bist ein Lehrer, der einen Wissenstest erstellt.
+function getQuizPrompt(subject?: string, topic?: string): string {
+    const langSubjects = ['Englisch', 'Deutsch', 'Französisch', 'Spanisch', 'Latein', 'Italienisch', 'Sprachaufenthalt']
+    const isLanguage = subject && langSubjects.some(s => subject.toLowerCase().includes(s.toLowerCase()))
+
+    let subjectSpecificInstructions = ''
+    if (isLanguage) {
+        subjectSpecificInstructions = `
+- Da es sich um das Fach "${subject}" handelt, fokussiere dich auf:
+    1. Grammatik und korrekten Satzbau (z.B. richtige Wortstellung).
+    2. Korrekte Übersetzung zwischen Deutsch und ${subject}.
+    3. Korrekte Anwendung und Bedeutung von Vokabeln im Kontext.
+- WICHTIG: Vermeide reine "Faktenfragen" zum Inhalt von Tabellen oder Bildern (z.B. "Was macht Person X laut Tabelle?"), wenn diese ohne das Bild nicht sinnvoll sind. Die Fragen sollen das Sprachverständnis und die Sprachregeln prüfen.`
+    } else {
+        const subjectStr = subject || 'das vorliegende Fach'
+        subjectSpecificInstructions = `
+- Da es sich um das Fach "${subjectStr}" handelt, fokussiere dich auf:
+    1. Das Verständnis und die Anwendung des Lernstoffs.
+    2. Grundlegende Konzepte, Regeln und Zusammenhänge.
+- WICHTIG: Vermeide Fragen, die sich zu stark auf die äußere Form oder spezifische Positionen im Dokument beziehen (z.B. "Was steht in der 3. Zeile?"). Der Fokus liegt auf dem inhaltlichen Wissen.`
+    }
+
+    if (topic) {
+        subjectSpecificInstructions += `\n- Das konkrete Thema ist: "${topic}".`
+    }
+
+    return `Du bist ein Lehrer, der einen Wissenstest erstellt.
 Erstelle 8 bis 12 Multiple-Choice-Fragen auf Deutsch für Schülerinnen und Schüler ab der 5. Klasse.
+${subjectSpecificInstructions}
 
 Jede Frage hat:
 - eine klare Frage. WICHTIG: Die Frage muss aus sich heraus verständlich sein und genügend fachlichen Kontext bieten (z.B. statt "Was passiert im 3. Schritt?" explizit "Was passiert im 3. Schritt der Fotosynthese?"). Stelle keine Meta-Fragen zum Text ("Worum geht es in dem Material?"). WICHTIG: Vermeide Formulierungen wie "laut Seite 1", "im Text steht" oder "auf dem Bild sieht man". Die Fragen müssen aussehen, als kämen sie aus einem allgemeinen Lehrbuch.
@@ -196,6 +222,7 @@ Jede Frage hat:
 
 Antworte NUR mit einem validen JSON-Array, ohne Erklärungen davor oder danach:
 [{"question": "...", "options": ["A", "B", "C", "D"], "correct_index": 0, "explanation": "..."}]`
+}
 
 function parseQuizQuestions(rawText: string): QuizQuestion[] {
     const match = rawText.match(/\[[\s\S]*\]/)
@@ -210,7 +237,9 @@ function parseQuizQuestions(rawText: string): QuizQuestion[] {
 export async function generateQuizQuestionsFromFile(
     fileBuffer: Buffer,
     mimeType: string,
-    title: string
+    title: string,
+    subject?: string,
+    topic?: string
 ): Promise<QuizQuestion[]> {
     const client = getClient()
     const base64Data = fileBuffer.toString('base64')
@@ -219,7 +248,7 @@ export async function generateQuizQuestionsFromFile(
         contents: [{
             role: 'user',
             parts: [
-                { text: QUIZ_PROMPT },
+                { text: getQuizPrompt(subject, topic) },
                 { text: `\n\nDokumenttitel: "${title}"` },
                 { inlineData: { mimeType, data: base64Data } },
             ],
@@ -287,7 +316,9 @@ export async function detectSubjectAndTopicFromText(
 }
 export async function generateQuizQuestionsFromText(
     text: string,
-    title: string
+    title: string,
+    subject?: string,
+    topic?: string
 ): Promise<QuizQuestion[]> {
     const client = getClient()
     const response = await client.models.generateContent({
@@ -295,7 +326,7 @@ export async function generateQuizQuestionsFromText(
         contents: [{
             role: 'user',
             parts: [
-                { text: QUIZ_PROMPT },
+                { text: getQuizPrompt(subject, topic) },
                 { text: `\n\nDokumenttitel: "${title}"\n\nInhalt:\n${text.slice(0, 50000)}` },
             ],
         }],
@@ -488,12 +519,14 @@ export async function generatePodcastScriptFromCollection(
 
 export async function generateQuizQuestionsFromCollection(
     files: { buffer: Buffer; mimeType: string; title: string }[],
-    collectionTitle: string
+    collectionTitle: string,
+    subject?: string,
+    topic?: string
 ): Promise<QuizQuestion[]> {
     const client = getClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parts: any[] = [
-        { text: QUIZ_PROMPT },
+        { text: getQuizPrompt(subject, topic) },
         { text: `\n\nSammlungstitel: "${collectionTitle}"` }
     ];
     files.forEach((f, i) => {
