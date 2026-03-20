@@ -19,8 +19,10 @@ type Props = {
     SUBJECT_PALETTES: any
 }
 
-function ContentRow({ href, topic, subtitle, badge, badgeColor, deleteButton }: {
-    href: string; topic: string; subtitle: string; badge?: string
+import { formatDate } from '@/utils/format'
+
+function ContentRow({ href, topic, subtitle, date, badge, badgeColor, deleteButton }: {
+    href: string; topic: string; subtitle: string; date?: string; badge?: string
     badgeColor: 'purple' | 'amber' | 'blue'; deleteButton?: React.ReactNode
 }) {
     const badgeStyles = {
@@ -34,8 +36,12 @@ function ContentRow({ href, topic, subtitle, badge, badgeColor, deleteButton }: 
                 <div className="flex items-center gap-3 min-w-0">
                     <Tag className="w-3.5 h-3.5 text-white/30 shrink-0" />
                     <div className="min-w-0">
-                        <p className="text-white text-sm font-semibold">{topic}</p>
-                        <p className="text-white/30 text-xs truncate max-w-xs">{subtitle}</p>
+                        <p className="text-white text-sm font-semibold truncate max-w-[200px] sm:max-w-none">{topic}</p>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-white/30 text-[10px] uppercase tracking-wider mt-0.5">
+                            {date && <span className="shrink-0 tabular-nums">Erstellt am {formatDate(date)}</span>}
+                            {date && subtitle && <span className="opacity-30">•</span>}
+                            <span className="truncate max-w-[150px] sm:max-w-xs">{subtitle}</span>
+                        </div>
                     </div>
                 </div>
                 {badge && <span className={`shrink-0 border text-xs px-2.5 py-1 rounded-full ml-3 ${badgeStyles[badgeColor]}`}>{badge}</span>}
@@ -164,6 +170,7 @@ export default function DashboardTabs({ allDocs, filteredDocs, subjects, current
                                             <ContentRow
                                                 key={dk.id} href={`/deck/${dk.id}`}
                                                 topic={getTopic(dk.doc)} subtitle={dk.doc.context_info ? `${dk.doc.context_info} • ${dk.doc.title}` : dk.doc.title}
+                                                date={dk.created_at}
                                                 badge={`${dk.card_count} Karten`} badgeColor="purple"
                                                 deleteButton={<DeleteDeckButton deckId={dk.id} />}
                                             />
@@ -180,6 +187,7 @@ export default function DashboardTabs({ allDocs, filteredDocs, subjects, current
                                             <ContentRow
                                                 key={q.id} href={`/quiz/${q.id}`}
                                                 topic={getTopic(q.doc)} subtitle={q.doc.context_info ? `${q.doc.context_info} • ${q.doc.title}` : q.doc.title}
+                                                date={q.created_at}
                                                 badge={`${q.question_count} Fragen`} badgeColor="amber"
                                                 deleteButton={<DeleteQuizButton quizId={q.id} />}
                                             />
@@ -196,6 +204,7 @@ export default function DashboardTabs({ allDocs, filteredDocs, subjects, current
                                             <ContentRow
                                                 key={a.id} href={`/audio/${a.id}`}
                                                 topic={getTopic(a.doc)} subtitle={a.doc.context_info ? `${a.doc.context_info} • ${a.doc.title}` : a.doc.title}
+                                                date={a.created_at}
                                                 badgeColor="blue"
                                                 deleteButton={<DeleteAudioButton audioId={a.id} />}
                                             />

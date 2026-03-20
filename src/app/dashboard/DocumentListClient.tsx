@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { TopicLabel, DeleteDocumentButton, ActionPill } from './DashboardActions'
 import { deleteMultipleDocuments } from './manage-actions'
+import { formatDate } from '@/utils/format'
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
     PDF: <FileText className="w-4 h-4 text-red-400" />,
@@ -103,22 +104,28 @@ export default function DocumentListClient({ filteredDocs, currentSubject, col }
                                 </div>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <div className="shrink-0">{TYPE_ICONS[doc.type] ?? <FileCode className="w-4 h-4 text-white/30" />}</div>
-                                    <div className="flex flex-col min-w-0 flex-1">
-                                        <Link href={`/learn/${doc.id}`} className="text-white/80 hover:text-white text-sm font-medium truncate transition-colors group flex items-center gap-1">
-                                            {doc.title}
-                                            <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-50 shrink-0 hidden sm:block" />
+                            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                                <div className="flex items-start gap-2.5 min-w-0">
+                                    <div className="shrink-0 mt-0.5">{TYPE_ICONS[doc.type] ?? <FileCode className="w-4 h-4 text-white/30" />}</div>
+                                    <div className="flex-1 min-w-0">
+                                        <Link href={`/learn/${doc.id}`} className="text-white/90 hover:text-white text-sm font-semibold truncate transition-colors group flex items-center gap-1.5">
+                                            <span className="truncate">{doc.title}</span>
+                                            <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 shrink-0 hidden sm:block" />
                                         </Link>
-                                        {doc.context_info && <span className="text-white/40 text-[10px] leading-tight truncate mt-0.5">{doc.context_info}</span>}
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5">
+                                            <span className="text-white/30 text-[10px] uppercase tracking-wider tabular-nums shrink-0 whitespace-nowrap bg-white/5 px-1.5 py-0.5 rounded">
+                                                {formatDate(doc.created_at)}
+                                            </span>
+                                            {doc.context_info && (
+                                                <span className="text-white/40 text-[10px] truncate leading-tight max-w-[150px] sm:max-w-[250px]">{doc.context_info}</span>
+                                            )}
+                                            <div className="flex shrink-0 ml-auto sm:ml-0">
+                                                <span className={`text-[10px] font-bold border px-2 py-0.5 rounded-full flex items-center uppercase tracking-tighter ${col.topicBadge}`}>
+                                                    <TopicLabel subjectName={currentSubject} topicName={topicName} />
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                {/* Thema mit Umbenennen */}
-                                <div className="flex mt-1 sm:mt-0 shrink-0">
-                                    <span className={`text-xs border px-2 py-0.5 rounded-full flex items-center ${col.topicBadge}`}>
-                                        <TopicLabel subjectName={currentSubject} topicName={topicName} />
-                                    </span>
                                 </div>
                             </div>
                         </div>

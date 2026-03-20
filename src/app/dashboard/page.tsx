@@ -21,10 +21,10 @@ import DashboardTabs from './DashboardTabs'
 
 type DocRow = {
     id: string; title: string; type: string; created_at: string
-    subject: string | null; subject_name: string | null; topic_name: string | null
-    flashcard_decks: { id: string; card_count: number }[]
-    audio_summaries: { id: string }[]
-    quizzes: { id: string; question_count: number }[]
+    subject: string | null; subject_name: string | null; topic_name: string | null; context_info: string | null
+    flashcard_decks: { id: string; card_count: number; created_at: string }[]
+    audio_summaries: { id: string; created_at: string }[]
+    quizzes: { id: string; question_count: number; created_at: string }[]
 }
 
 // ── Hilfsfunktionen ────────────────────────────────────────────────────────────
@@ -69,10 +69,10 @@ export default async function DashboardPage({
     const { data: rawDocs } = await supabase
         .from('documents')
         .select(`
-            id, title, type, created_at, subject, subject_name, topic_name,
-            flashcard_decks(id, card_count),
-            audio_summaries(id),
-            quizzes(id, question_count)
+            id, title, type, created_at, subject, subject_name, topic_name, context_info,
+            flashcard_decks(id, card_count, created_at),
+            audio_summaries(id, created_at),
+            quizzes(id, question_count, created_at)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
