@@ -83,7 +83,7 @@ export async function generateFlashcardsFromText(
 ): Promise<Flashcard[]> {
     const client = getClient()
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [
             {
                 role: 'user',
@@ -110,7 +110,7 @@ export async function generateFlashcardsFromFile(
     const base64Data = fileBuffer.toString('base64')
 
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [
             {
                 role: 'user',
@@ -166,7 +166,7 @@ export async function generatePodcastScriptFromFile(
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.0-flash',
         contents: [{
             role: 'user',
             parts: [
@@ -187,7 +187,7 @@ export async function generatePodcastScriptFromText(
     const client = getClient()
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.0-flash',
         contents: [{
             role: 'user',
             parts: [
@@ -260,7 +260,7 @@ export async function generateQuizQuestionsFromFile(
     const client = getClient()
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{
             role: 'user',
             parts: [
@@ -300,7 +300,7 @@ export async function detectSubjectAndTopicFromFile(
     const client = getClient()
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{
             role: 'user', parts: [
                 { text: SUBJECT_DETECTION_PROMPT },
@@ -319,7 +319,7 @@ export async function detectSubjectAndTopicFromText(
 ): Promise<SubjectDetection> {
     const client = getClient()
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{
             role: 'user', parts: [
                 { text: SUBJECT_DETECTION_PROMPT },
@@ -338,7 +338,7 @@ export async function generateQuizQuestionsFromText(
 ): Promise<QuizQuestion[]> {
     const client = getClient()
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{
             role: 'user',
             parts: [
@@ -395,7 +395,7 @@ export async function scriptToAudioBuffer(script: string): Promise<Buffer> {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await (client.models as any).generateContent({
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.0-flash',
         contents: [{ parts: [{ text }] }],
         generationConfig: {
             responseModalities: ['AUDIO'],
@@ -469,7 +469,7 @@ export async function groupImagesByContext(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{ role: 'user', parts }]
     });
 
@@ -504,7 +504,7 @@ export async function generateFlashcardsFromCollection(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{ role: 'user', parts }]
     });
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
@@ -529,7 +529,7 @@ export async function generatePodcastScriptFromCollection(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.0-flash',
         contents: [{ role: 'user', parts }]
     });
     return response.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
@@ -553,7 +553,7 @@ export async function generateQuizQuestionsFromCollection(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         contents: [{ role: 'user', parts }]
     });
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
