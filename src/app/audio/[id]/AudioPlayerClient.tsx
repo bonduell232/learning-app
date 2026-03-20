@@ -179,7 +179,16 @@ function RealAudioPlayer({ audioUrl, title, script }: { audioUrl: string; title:
 // ── Fallback: Browser TTS (wenn kein audioUrl) ────────────────────────────────
 
 function BrowserTTSPlayer({ script, title }: { script: string; title: string }) {
-    const sentences = splitSentences(script)
+    // Einfache Säuberung für die Browser-Stimme
+    const cleanText = script
+        .replace(/\*\*/g, '')
+        .replace(/\*/g, '')
+        .replace(/#/g, '')
+        .replace(/ Lukas:/g, ' Lukas sagt:')
+        .replace(/ Sarah:/g, ' Sarah sagt:')
+        .trim();
+
+    const sentences = splitSentences(cleanText)
     const [isPlaying, setIsPlaying] = useState(false)
     const [currentIdx, setCurrentIdx] = useState(0)
     const [speed, setSpeed] = useState(1)
@@ -190,7 +199,14 @@ function BrowserTTSPlayer({ script, title }: { script: string; title: string }) 
         if (idx >= sentences.length) { setIsPlaying(false); setFinished(true); return }
         window.speechSynthesis.cancel()
         const utter = new SpeechSynthesisUtterance(sentences[idx])
-        utter.lang = 'de-DE'; utter.rate = spd
+        
+        // Sprache erkennen (Grobe Heuristik für Englisch)
+        const englishWords = ['the', 'and', 'is', 'you', 'that', 'it', 'he', 'for', 'was', 'on', 'are', 'as', 'with', 'his', 'they', 'at', 'be', 'this', 'have', 'from']
+        const wordCount = sentences[idx].toLowerCase().split(/\s+/).length
+        const englishMatch = sentences[idx].toLowerCase().split(/\s+/).filter(w => englishWords.includes(w)).length
+        
+        utter.lang = (englishMatch / wordCount > 0.2) ? 'en-US' : 'de-DE'
+        utter.rate = spd
         utter.onend = () => speak(idx + 1, spd)
         utterRef.current = utter
         setCurrentIdx(idx)

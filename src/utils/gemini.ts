@@ -144,19 +144,33 @@ Struktur:
 Wichtig: Schreib so, als würdest du mit deinem besten Freund sprechen. Keine Schachtelsätze.
 Gib NUR den Fließtext zurück, keine Kapitelüberschriften oder Formatierung.`
 
+const PODCAST_DIALOG_PROMPT = `Du bist ein kreativer Lernbegleiter. Erstelle aus dem Lernmaterial ein lebendiges Gespräch zwischen zwei Personen auf Deutsch:
+- Lukas (ein Mentor, der Wissen begeistert und verständlich vermittelt)
+- Sarah (eine neugierige Schülerin, die kluge Fragen stellt)
+
+Struktur:
+1. Lockere Einleitung: Lukas begrüßt Sarah und nennt das Thema.
+2. Inhaltlicher Kern: Sarah fragt nach den wichtigsten Punkten, Lukas erklärt sie mit einfachen Beispielen. Es soll wie ein echter Podcast (NotebookLM-Stil) wirken.
+3. Kurzes Fazit: Sarah fasst das Wichtigste kurz zusammen, Lukas gibt einen motivierenden Schlusssatz.
+
+Wichtig: Schreibe ein natürliches Skript mit Sprecher-Labels (Lukas:, Sarah:), aber achte darauf, dass der Text flüssig bleibt.
+Gib NUR den Text des Gesprächs zurück. Nutze keine fetten Markierungen (wie **Lukas:**), sondern schreib einfach Lukas: oder Sarah: zu Beginn der Zeile.`
+
 export async function generatePodcastScriptFromFile(
     fileBuffer: Buffer,
     mimeType: string,
-    title: string
+    title: string,
+    mode: 'monologue' | 'conversation' = 'monologue'
 ): Promise<string> {
     const client = getClient()
+    const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: [{
             role: 'user',
             parts: [
-                { text: PODCAST_PROMPT },
+                { text: prompt },
                 { text: `\n\nDokumenttitel: "${title}"` },
                 { inlineData: { mimeType, data: base64Data } },
             ],
@@ -167,15 +181,17 @@ export async function generatePodcastScriptFromFile(
 
 export async function generatePodcastScriptFromText(
     text: string,
-    title: string
+    title: string,
+    mode: 'monologue' | 'conversation' = 'monologue'
 ): Promise<string> {
     const client = getClient()
+    const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     const response = await client.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: [{
             role: 'user',
             parts: [
-                { text: PODCAST_PROMPT },
+                { text: prompt },
                 { text: `\n\nDokumenttitel: "${title}"\n\nInhalt:\n${text.slice(0, 50000)}` },
             ],
         }],
@@ -366,20 +382,36 @@ export function pcmToWav(pcm: Buffer, sampleRate = 24000): Buffer {
 }
 
 /**
+ * Bereinigt einen Text von Markdown-Zeichen (Sterne, Rauten), damit diese nicht vorgelesen werden.
+ */
+export function cleanScriptForTTS(text: string): string {
+    return text
+        .replace(/\*\*/g, '') // Entfernt Doppelsterne (fett)
+        .replace(/\*/g, '')   // Entfernt einfache Sterne (kursiv)
+        .replace(/#/g, '')    // Entfernt Rauten (Überschriften)
+        .replace(/__/g, '')   // Entfernt Unterstriche
+        .replace(/\[|\]/g, '') // Entfernt eckige Klammern
+        .trim()
+}
+
+/**
  * Erzeugt eine WAV-Audiodatei aus einem Podcast-Script via Gemini 2.0 Flash TTS.
  */
 export async function scriptToAudioBuffer(script: string): Promise<Buffer> {
     const client = getClient()
 
+    // Bereinige den Text für die Sprachausgabe
+    const textToSpeak = cleanScriptForTTS(script)
+
     // Kürze sehr lange Scripts (Gemini TTS-Limit)
     const MAX_CHARS = 8000
-    const text = script.length > MAX_CHARS
-        ? script.slice(0, MAX_CHARS) + ' [Ende des Podcasts]'
-        : script
+    const text = textToSpeak.length > MAX_CHARS
+        ? textToSpeak.slice(0, MAX_CHARS) + ' [Ende des Podcasts]'
+        : textToSpeak
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await (client.models as any).generateContent({
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         contents: [{ parts: [{ text }] }],
         generationConfig: {
             responseModalities: ['AUDIO'],
@@ -497,12 +529,14 @@ export async function generateFlashcardsFromCollection(
 
 export async function generatePodcastScriptFromCollection(
     files: { buffer: Buffer; mimeType: string; title: string }[],
-    collectionTitle: string
+    collectionTitle: string,
+    mode: 'monologue' | 'conversation' = 'monologue'
 ): Promise<string> {
     const client = getClient();
+    const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parts: any[] = [
-        { text: PODCAST_PROMPT },
+        { text: prompt },
         { text: `\n\nSammlungstitel: "${collectionTitle}"` }
     ];
     files.forEach((f, i) => {
