@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/auth/actions'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Rocket, LayoutDashboard, Upload, LogOut } from 'lucide-react'
+import { Rocket, LayoutDashboard, Upload, LogOut, Folders, BookOpen } from 'lucide-react'
 
 export default async function DashboardLayout({
     children,
@@ -31,13 +31,25 @@ export default async function DashboardLayout({
 
                 {/* Navigation */}
                 <nav className="flex-1 space-y-1">
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group"
-                    >
-                        <LayoutDashboard className="w-4 h-4 group-hover:text-[#9333EA] transition-colors" />
-                        Mein Dashboard
-                    </Link>
+                    <div className="space-y-1 pb-4">
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group"
+                        >
+                            <LayoutDashboard className="w-4 h-4 group-hover:text-[#9333EA] transition-colors" />
+                            Mein Dashboard
+                        </Link>
+                        {/* SUB-MENU */}
+                        <div className="ml-9 space-y-1">
+                            <Link href="/dashboard?tab=material" className="flex items-center gap-2 py-2 text-xs text-white/40 hover:text-white/80 transition-all group">
+                                <Folders className="w-3 h-3 group-hover:text-[#9333EA]" /> Material & Quellen
+                            </Link>
+                            <Link href="/dashboard?tab=learn" className="flex items-center gap-2 py-2 text-xs text-white/40 hover:text-white/80 transition-all group">
+                                <BookOpen className="w-3 h-3 group-hover:text-amber-500" /> Mein Lernraum
+                            </Link>
+                        </div>
+                    </div>
+
                     <Link
                         href="/upload"
                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group"
@@ -45,17 +57,19 @@ export default async function DashboardLayout({
                         <Upload className="w-4 h-4 group-hover:text-[#9333EA] transition-colors" />
                         Hochladen
                     </Link>
-                    <Link
-                        href="/impressum"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group"
-                    >
-                        <span className="w-4 text-center group-hover:text-[#9333EA] transition-colors font-bold i">§</span>
-                        Impressum
-                    </Link>
                 </nav>
 
                 {/* User + Logout */}
-                <div className="border-t border-white/10 pt-4 space-y-3">
+                <div className="border-t border-white/10 pt-4 space-y-2">
+                    {/* IMPRESSUM (Less prominent) */}
+                    <Link
+                        href="/impressum"
+                        className="flex items-center gap-3 px-4 py-2 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/[0.02] transition-all text-[11px] font-medium group mb-2"
+                    >
+                        <span className="w-4 text-center group-hover:text-white/50 transition-colors font-bold">§</span>
+                        Impressum & Rechtliches
+                    </Link>
+
                     <div className="flex items-center gap-3 px-2">
                         <div className="w-8 h-8 rounded-full bg-[#9333EA]/30 border border-[#9333EA]/40 flex items-center justify-center text-xs font-bold text-[#9333EA]">
                             {initial}

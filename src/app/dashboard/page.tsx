@@ -57,14 +57,13 @@ function getTopic(d: DocRow) { return d.topic_name ?? 'Allgemein' }
 
 // ── Seite ──────────────────────────────────────────────────────────────────────
 
-export default async function DashboardPage({
-    searchParams,
-}: { searchParams: Promise<{ fach?: string }> }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ tab?: string, fach?: string }> }) {
+    const { tab, fach: activeTab } = await searchParams
+    const initialTab = tab === 'material' ? 'material' : 'learn'
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
-
-    const { fach: activeTab } = await searchParams
 
     const { data: rawDocs } = await supabase
         .from('documents')
@@ -104,12 +103,14 @@ export default async function DashboardPage({
             </div>
 
             <DashboardTabs
+                key={initialTab}
                 allDocs={allDocs}
                 filteredDocs={filteredDocs}
                 subjects={subjects}
                 currentSubject={currentSubject}
                 greeting={greeting}
                 SUBJECT_PALETTES={SUBJECT_PALETTES}
+                initialTab={initialTab}
             />
         </div>
     )

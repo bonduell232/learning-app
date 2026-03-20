@@ -17,6 +17,7 @@ type Props = {
     currentSubject: string
     greeting: string
     SUBJECT_PALETTES: any
+    initialTab: 'material' | 'learn'
 }
 
 import { formatDate } from '@/utils/format'
@@ -83,8 +84,8 @@ function Section({ icon, title, count, actionHref, actionLabel, children }: {
 
 function getTopic(d: DocRow) { return d.topic_name ?? 'Allgemein' }
 
-export default function DashboardTabs({ allDocs, filteredDocs, subjects, currentSubject, greeting, SUBJECT_PALETTES }: Props) {
-    const [activeTab, setActiveTab] = useState<'material' | 'learn'>('learn')
+export default function DashboardTabs({ allDocs, filteredDocs, subjects, currentSubject, greeting, SUBJECT_PALETTES, initialTab }: Props) {
+    const [activeTab, setActiveTab] = useState<'material' | 'learn'>(initialTab)
 
     const DEFAULT_PALETTE = { tab: 'border-[#9333EA] text-purple-300', accent: 'border-l-[#9333EA]', topicBadge: 'bg-[#9333EA]/10 text-purple-300 border-[#9333EA]/20' }
     const col = SUBJECT_PALETTES[currentSubject] ?? DEFAULT_PALETTE
