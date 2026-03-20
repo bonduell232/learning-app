@@ -11,7 +11,7 @@ import { revalidatePath } from 'next/cache'
 import { getUserRole, checkLimit } from '@/utils/checkLimit'
 import { isEnabled } from '@/config/features'
 
-export async function generateAudio(documentId: string): Promise<{ audioId?: string; error?: string }> {
+export async function generateAudio(documentId: string, mode: 'monologue' | 'conversation' = 'monologue'): Promise<{ audioId?: string; error?: string }> {
     const supabase = await createClient()
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -70,12 +70,12 @@ export async function generateAudio(documentId: string): Promise<{ audioId?: str
     let script: string
     try {
         if (doc.type === 'COLLECTION') {
-            script = await generatePodcastScriptFromCollection(filesForGemini, doc.title)
+            script = await generatePodcastScriptFromCollection(filesForGemini, doc.title, mode)
         } else if (doc.type === 'PDF' || doc.type === 'IMAGE') {
-            script = await generatePodcastScriptFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title)
+            script = await generatePodcastScriptFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title, mode)
         } else {
             const raw = filesForGemini[0].buffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
-            script = await generatePodcastScriptFromText(raw, doc.title)
+            script = await generatePodcastScriptFromText(raw, doc.title, mode)
         }
     } catch (e) {
         return { error: `KI-Fehler (Script): ${e instanceof Error ? e.message : String(e)}` }
