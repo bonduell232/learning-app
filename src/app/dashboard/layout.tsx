@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Rocket, LayoutDashboard, Upload, LogOut, Folders, BookOpen, BarChart3 } from 'lucide-react'
 import { getUserRole } from '@/utils/checkLimit'
+import MobileNav from './MobileNav'
 
 export default async function DashboardLayout({
     children,
@@ -107,26 +108,7 @@ export default async function DashboardLayout({
             </main>
 
             {/* Bottom Nav (Mobile) */}
-            <nav className="md:hidden fixed bottom-0 left-0 w-full bg-[#060406]/95 backdrop-blur-md border-t border-white/10 p-3 z-50 flex items-center justify-around pb-safe">
-                <Link href="/dashboard" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-white transition-colors">
-                    <LayoutDashboard className="w-5 h-5" />
-                    <span className="text-[10px] font-bold tracking-wide">Dashboard</span>
-                </Link>
-                <Link href="/upload" className="flex flex-col items-center gap-1.5 p-2 transition-colors">
-                    <Upload className="w-5 h-5 text-[#A855F7] drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
-                    <span className="text-[10px] font-bold tracking-wide text-[#A855F7]">Hochladen</span>
-                </Link>
-                <Link href="/impressum" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-white transition-colors">
-                    <span className="text-xl h-5 leading-none flex items-center justify-center">§</span>
-                    <span className="text-[10px] font-bold tracking-wide">Legal</span>
-                </Link>
-                <form action={logout}>
-                    <button type="submit" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-red-400 transition-colors">
-                        <LogOut className="w-5 h-5" />
-                        <span className="text-[10px] font-bold tracking-wide">Abmelden</span>
-                    </button>
-                </form>
-            </nav>
+            <MobileNav isAdmin={isAdmin} />
         </div>
     )
 }
