@@ -79,11 +79,13 @@ export async function analyzeStoredFile(
         const buf = Buffer.from(await fileData.arrayBuffer())
         let detection
 
+        const logStats = { supabase, userId: user.id, documentId: null, type: 'DETECTION' as any }
+
         if (fileType === 'PDF' || fileType === 'IMAGE') {
-            detection = await detectSubjectAndTopicFromFile(buf, mimeType, title)
+            detection = await detectSubjectAndTopicFromFile(buf, mimeType, title, logStats)
         } else {
             const rawText = buf.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
-            detection = await detectSubjectAndTopicFromText(rawText, title)
+            detection = await detectSubjectAndTopicFromText(rawText, title, logStats)
         }
 
         return {

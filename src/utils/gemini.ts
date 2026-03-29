@@ -1,4 +1,11 @@
-import { getAI, MODEL_NAME } from './vertex'
+import { getAI, MODEL_NAME, logAIUsage, type AIContentType } from './vertex'
+
+export interface LogStats {
+    supabase: any
+    userId: string
+    documentId: string | null
+    type: AIContentType
+}
 
 export interface Flashcard {
     front: string
@@ -75,7 +82,8 @@ function parseFlashcards(rawText: string): Flashcard[] {
  */
 export async function generateFlashcardsFromText(
     text: string,
-    title: string
+    title: string,
+    logStats?: LogStats
 ): Promise<Flashcard[]> {
     const client = getAI()
     const response = await client.models.generateContent({
@@ -91,6 +99,10 @@ export async function generateFlashcardsFromText(
         ],
     })
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseFlashcards(raw)
 }
 
@@ -100,7 +112,8 @@ export async function generateFlashcardsFromText(
 export async function generateFlashcardsFromFile(
     fileBuffer: Buffer,
     mimeType: string,
-    title: string
+    title: string,
+    logStats?: LogStats
 ): Promise<Flashcard[]> {
     const client = getAI()
     const base64Data = fileBuffer.toString('base64')
@@ -124,6 +137,10 @@ export async function generateFlashcardsFromFile(
         ],
     })
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseFlashcards(raw)
 }
 
@@ -156,7 +173,8 @@ export async function generatePodcastScriptFromFile(
     fileBuffer: Buffer,
     mimeType: string,
     title: string,
-    mode: 'monologue' | 'conversation' = 'monologue'
+    mode: 'monologue' | 'conversation' = 'monologue',
+    logStats?: LogStats
 ): Promise<string> {
     const client = getAI()
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
@@ -172,13 +190,18 @@ export async function generatePodcastScriptFromFile(
             ],
         }],
     })
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return response.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? ''
 }
 
 export async function generatePodcastScriptFromText(
     text: string,
     title: string,
-    mode: 'monologue' | 'conversation' = 'monologue'
+    mode: 'monologue' | 'conversation' = 'monologue',
+    logStats?: LogStats
 ): Promise<string> {
     const client = getAI()
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
@@ -192,6 +215,10 @@ export async function generatePodcastScriptFromText(
             ],
         }],
     })
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return response.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? ''
 }
 
@@ -251,7 +278,8 @@ export async function generateQuizQuestionsFromFile(
     mimeType: string,
     title: string,
     subject?: string,
-    topic?: string
+    topic?: string,
+    logStats?: LogStats
 ): Promise<QuizQuestion[]> {
     const client = getAI()
     const base64Data = fileBuffer.toString('base64')
@@ -267,6 +295,10 @@ export async function generateQuizQuestionsFromFile(
         }],
     })
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseQuizQuestions(raw)
 }
 
@@ -291,7 +323,8 @@ function parseSubjectDetection(rawText: string): SubjectDetection {
 export async function detectSubjectAndTopicFromFile(
     fileBuffer: Buffer,
     mimeType: string,
-    title: string
+    title: string,
+    logStats?: LogStats
 ): Promise<SubjectDetection> {
     const client = getAI()
     const base64Data = fileBuffer.toString('base64')
@@ -306,12 +339,17 @@ export async function detectSubjectAndTopicFromFile(
         }],
     })
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseSubjectDetection(raw)
 }
 
 export async function detectSubjectAndTopicFromText(
     text: string,
-    title: string
+    title: string,
+    logStats?: LogStats
 ): Promise<SubjectDetection> {
     const client = getAI()
     const response = await client.models.generateContent({
@@ -324,13 +362,18 @@ export async function detectSubjectAndTopicFromText(
         }],
     })
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseSubjectDetection(raw)
 }
 export async function generateQuizQuestionsFromText(
     text: string,
     title: string,
     subject?: string,
-    topic?: string
+    topic?: string,
+    logStats?: LogStats
 ): Promise<QuizQuestion[]> {
     const client = getAI()
     const response = await client.models.generateContent({
@@ -344,6 +387,10 @@ export async function generateQuizQuestionsFromText(
         }],
     })
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseQuizQuestions(raw)
 }
 
@@ -502,7 +549,8 @@ export async function groupImagesByContext(
 
 export async function generateFlashcardsFromCollection(
     files: { buffer: Buffer; mimeType: string; title: string }[],
-    collectionTitle: string
+    collectionTitle: string,
+    logStats?: LogStats
 ): Promise<Flashcard[]> {
     const client = getAI();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -520,13 +568,18 @@ export async function generateFlashcardsFromCollection(
         contents: [{ role: 'user', parts }]
     });
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseFlashcards(raw);
 }
 
 export async function generatePodcastScriptFromCollection(
     files: { buffer: Buffer; mimeType: string; title: string }[],
     collectionTitle: string,
-    mode: 'monologue' | 'conversation' = 'monologue'
+    mode: 'monologue' | 'conversation' = 'monologue',
+    logStats?: LogStats
 ): Promise<string> {
     const client = getAI();
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
@@ -544,6 +597,10 @@ export async function generatePodcastScriptFromCollection(
         model: MODEL_NAME,
         contents: [{ role: 'user', parts }]
     });
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return response.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
 }
 
@@ -551,7 +608,8 @@ export async function generateQuizQuestionsFromCollection(
     files: { buffer: Buffer; mimeType: string; title: string }[],
     collectionTitle: string,
     subject?: string,
-    topic?: string
+    topic?: string,
+    logStats?: LogStats
 ): Promise<QuizQuestion[]> {
     const client = getAI();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -569,6 +627,10 @@ export async function generateQuizQuestionsFromCollection(
         contents: [{ role: 'user', parts }]
     });
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const usage = response.usageMetadata
+    if (logStats && usage) {
+        await logAIUsage(logStats.supabase, logStats.userId, logStats.documentId, logStats.type, usage.promptTokenCount || 0, usage.candidatesTokenCount || 0)
+    }
     return parseQuizQuestions(raw);
 }
 

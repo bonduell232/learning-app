@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { getAI, MODEL_NAME, calculateEstimatedCost } from '@/utils/vertex';
+import { getAI, MODEL_NAME, calculateEstimatedCost, logAIUsage } from '@/utils/vertex';
 
 export interface PodcastGenerationResponse {
     script: string;
@@ -33,19 +33,8 @@ export async function generatePodcastScript(prompt: string, documentId: string):
     const outputTokens = usage?.candidatesTokenCount || 0;
     const estimatedCost = calculateEstimatedCost(MODEL_NAME, inputTokens, outputTokens);
 
-    // Logging in die DB (Kostenkontrolle) - Jetzt sicher über RLS
-    const { error: logErr } = await supabase
-        .from('ai_usage_logs')
-        .insert({
-            user_id: user.id,
-            document_id: documentId,
-            model_id: MODEL_NAME,
-            input_tokens: inputTokens,
-            output_tokens: outputTokens,
-            estimated_cost_usd: estimatedCost,
-        });
-
-    if (logErr) console.error("Kosten-Logging fehlgeschlagen:", logErr.message);
+    // Zentrales Logging (Kostenkontrolle)
+    await logAIUsage(supabase, user.id, documentId, 'AUDIO', inputTokens, outputTokens);
 
     return {
         script: text,

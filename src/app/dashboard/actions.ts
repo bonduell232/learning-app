@@ -74,14 +74,16 @@ export async function generateFlashcards(documentId: string): Promise<{ deckId?:
     // 5. Gemini aufrufen (Strategie je nach Dateityp)
     let flashcards
     try {
+        const logStats = { supabase, userId: user.id, documentId, type: (doc.type === 'COLLECTION' ? 'COLLECTION' : 'FLASHCARD') as any }
+
         if (doc.type === 'COLLECTION') {
-            flashcards = await generateFlashcardsFromCollection(filesForGemini, doc.title)
+            flashcards = await generateFlashcardsFromCollection(filesForGemini, doc.title, logStats)
         } else if (doc.type === 'PDF' || doc.type === 'IMAGE') {
-            flashcards = await generateFlashcardsFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title)
+            flashcards = await generateFlashcardsFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title, logStats)
         } else {
             // Word/Präsentation: Rohtext aus Puffer extrahieren
             const rawText = filesForGemini[0].buffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
-            flashcards = await generateFlashcardsFromText(rawText, doc.title)
+            flashcards = await generateFlashcardsFromText(rawText, doc.title, logStats)
         }
     } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e)

@@ -50,3 +50,38 @@ export function calculateEstimatedCost(model: string, inputTokens: number, outpu
     const rates = COST_RATES[model as keyof typeof COST_RATES] || COST_RATES['gemini-2.5-flash'];
     return (inputTokens * rates.input) + (outputTokens * rates.output);
 }
+
+export type AIContentType = 'FLASHCARD' | 'QUIZ' | 'AUDIO' | 'DETECTION' | 'COLLECTION';
+
+/**
+ * Zentrales Logging für KI-Anfragen.
+ * Erfordert, dass die Tabelle ai_usage_logs das Feld content_type (TEXT) besitzt.
+ */
+export async function logAIUsage(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    supabase: any,
+    userId: string,
+    documentId: string | null,
+    type: AIContentType,
+    inputTokens: number,
+    outputTokens: number
+) {
+    const estimatedCost = calculateEstimatedCost(MODEL_NAME, inputTokens, outputTokens);
+    
+    const { error } = await supabase
+        .from('ai_usage_logs')
+        .insert({
+            user_id: userId,
+            document_id: documentId,
+            content_type: type, // Wir fügen dieses Feld hinzu
+            model_id: MODEL_NAME,
+            input_tokens: inputTokens,
+            output_tokens: outputTokens,
+            estimated_cost_usd: estimatedCost,
+        });
+
+    if (error) {
+        console.error(`[AI Usage] Fehler beim Logging (${type}):`, error.message);
+        // Wir werfen keinen Fehler, damit die Hauptanwendung weiterläuft
+    }
+}

@@ -82,13 +82,15 @@ export async function generateQuiz(documentId: string): Promise<{ quizId?: strin
 
     let questions
     try {
+        const logStats = { supabase, userId: user.id, documentId, type: (doc.type === 'COLLECTION' ? 'COLLECTION' : 'QUIZ') as any }
+
         if (doc.type === 'COLLECTION') {
-            questions = await generateQuizQuestionsFromCollection(filesForGemini, doc.title, subject, topic)
+            questions = await generateQuizQuestionsFromCollection(filesForGemini, doc.title, subject, topic, logStats)
         } else if (doc.type === 'PDF' || doc.type === 'IMAGE') {
-            questions = await generateQuizQuestionsFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title, subject, topic)
+            questions = await generateQuizQuestionsFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title, subject, topic, logStats)
         } else {
             const raw = filesForGemini[0].buffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
-            questions = await generateQuizQuestionsFromText(raw, doc.title, subject, topic)
+            questions = await generateQuizQuestionsFromText(raw, doc.title, subject, topic, logStats)
         }
     } catch (e) {
         return { error: `KI-Fehler: ${e instanceof Error ? e.message : String(e)}` }
