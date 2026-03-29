@@ -112,11 +112,12 @@ export default async function DashboardLayout({
                     <LayoutDashboard className="w-5 h-5" />
                     <span className="text-[10px] font-bold tracking-wide">Dashboard</span>
                 </Link>
-                <div className="-mt-8 relative z-10">
-                    <Link href="/upload" className="flex items-center justify-center w-14 h-14 bg-[#9333EA] hover:bg-[#a855f7] rounded-full text-white shadow-[0_0_20px_rgba(147,51,234,0.4)] transition-all">
-                        <Upload className="w-6 h-6 ml-0.5" />
-                    </Link>
-                </div>
+                <Link href="/upload" className="flex flex-col items-center gap-1.5 p-2 text-white/70 hover:text-white transition-colors">
+                    <div className="w-12 h-12 bg-[#9333EA] hover:bg-[#a855f7] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(147,51,234,0.4)] transition-all -mt-7 mb-0.5">
+                        <Upload className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-bold tracking-wide">Hochladen</span>
+                </Link>
                 <Link href="/impressum" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-white transition-colors">
                     <span className="text-xl h-5 leading-none">§</span>
                     <span className="text-[10px] font-bold tracking-wide">Legal</span>
