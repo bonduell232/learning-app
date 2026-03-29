@@ -49,6 +49,7 @@
 - **Reliability:** Priority is reliability over speed.
 - **Logic:** Never guess at business logic.
 - **Protocol:** Follow the Data-First Rule: before building any tool, data schema must be defined here.
+- **Deployment Protocol:** Vor jedem `git push` oder Vercel-Deployment wird grundsätzlich lokal ein Build (`npm run build`) durchgeführt und der lokale Webserver neu gestartet, um die Stabilität der Anwendung zu verifizieren.
 
 ## Architectural Invariants
 - **Layer 1:** Architecture (`architecture/`) - Technical SOPs and rules.
