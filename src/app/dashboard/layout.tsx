@@ -2,7 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/auth/actions'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Rocket, LayoutDashboard, Upload, LogOut, Folders, BookOpen } from 'lucide-react'
+import { Rocket, LayoutDashboard, Upload, LogOut, Folders, BookOpen, BarChart3 } from 'lucide-react'
+import { getUserRole } from '@/utils/checkLimit'
 
 export default async function DashboardLayout({
     children,
@@ -16,6 +17,8 @@ export default async function DashboardLayout({
 
     const email = user.email ?? ''
     const initial = email[0]?.toUpperCase() ?? '?'
+    const role = await getUserRole(supabase, user.id)
+    const isAdmin = role === 'ADMIN' || email === 'bonduell232@gmail.com'
 
     return (
         <div className="min-h-screen bg-[#060406] flex font-manrope pb-20 md:pb-0">
@@ -57,6 +60,16 @@ export default async function DashboardLayout({
                         <Upload className="w-4 h-4 group-hover:text-[#9333EA] transition-colors" />
                         Hochladen
                     </Link>
+
+                    {isAdmin && (
+                        <Link
+                            href="/dashboard/admin/stats"
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:text-white hover:bg-white/5 border border-indigo-500/20 bg-indigo-500/5 transition-all text-sm font-medium group mt-4"
+                        >
+                            <BarChart3 className="w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
+                            Kostenkontrolle
+                        </Link>
+                    )}
                 </nav>
 
                 {/* User + Logout */}

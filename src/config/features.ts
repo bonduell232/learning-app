@@ -5,28 +5,28 @@
  * Kein anderer Code muss angepasst werden.
  */
 
-export type Role = 'FREE' | 'PREMIUM'
+export type Role = 'FREE' | 'PREMIUM' | 'ADMIN'
 
 export const FEATURES = {
     upload: {
         /** Maximale Anzahl Dokumente */
-        maxFiles: { FREE: 10, PREMIUM: Infinity },
+        maxFiles: { FREE: 10, PREMIUM: Infinity, ADMIN: Infinity },
     },
     flashcards: {
         /** Feature aktiv? */
-        enabled: { FREE: true, PREMIUM: true },
+        enabled: { FREE: true, PREMIUM: true, ADMIN: true },
         /** Maximale Anzahl Lernkarten-Decks */
-        maxDecks: { FREE: 3, PREMIUM: Infinity },
+        maxDecks: { FREE: 3, PREMIUM: Infinity, ADMIN: Infinity },
     },
     audio: {
-        enabled: { FREE: true, PREMIUM: true },
+        enabled: { FREE: true, PREMIUM: true, ADMIN: true },
         /** Maximale Anzahl Audio-Zusammenfassungen */
-        maxSummaries: { FREE: 1, PREMIUM: Infinity },
+        maxSummaries: { FREE: 1, PREMIUM: Infinity, ADMIN: Infinity },
     },
     quiz: {
-        enabled: { FREE: true, PREMIUM: true },
+        enabled: { FREE: true, PREMIUM: true, ADMIN: true },
         /** Maximale Anzahl Quizze */
-        maxQuizzes: { FREE: 3, PREMIUM: Infinity },
+        maxQuizzes: { FREE: 3, PREMIUM: Infinity, ADMIN: Infinity },
     },
 } as const
 

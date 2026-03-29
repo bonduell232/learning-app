@@ -133,7 +133,7 @@ export async function generateFlashcardsFromFile(
 
 // ─── Podcast ─────────────────────────────────────────────────────────────────
 
-const PODCAST_PROMPT = `Du bist ein freundlicher Lernbegleiter für Schülerinnen und Schüler ab der 5. Klasse.
+export const PODCAST_PROMPT = `Du bist ein freundlicher Lernbegleiter für Schülerinnen und Schüler ab der 5. Klasse.
 Erstelle aus dem Lernmaterial einen kurzen, lebendigen Lern-Podcast-Text auf Deutsch.
 
 Struktur:
@@ -144,7 +144,7 @@ Struktur:
 Wichtig: Schreib so, als würdest du mit deinem besten Freund sprechen. Keine Schachtelsätze.
 Gib NUR den Fließtext zurück, keine Kapitelüberschriften oder Formatierung.`
 
-const PODCAST_DIALOG_PROMPT = `Du bist ein kreativer Lernbegleiter. Erstelle aus dem Lernmaterial ein lebendiges Gespräch zwischen zwei Personen auf Deutsch:
+export const PODCAST_DIALOG_PROMPT = `Du bist ein kreativer Lernbegleiter. Erstelle aus dem Lernmaterial ein lebendiges Gespräch zwischen zwei Personen auf Deutsch:
 - Lukas (ein Mentor, der Wissen begeistert und verständlich vermittelt)
 - Sarah (eine neugierige Schülerin, die kluge Fragen stellt)
 

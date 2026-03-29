@@ -2,11 +2,11 @@
 
 import { createClient } from '@/utils/supabase/server'
 import {
-    generatePodcastScriptFromFile,
-    generatePodcastScriptFromText,
-    generatePodcastScriptFromCollection,
-    scriptToAudioBuffer,
+    PODCAST_PROMPT,
+    PODCAST_DIALOG_PROMPT,
 } from '@/utils/gemini'
+import { generateHighQualityAudio } from '@/services/ttsService'
+import { generatePodcastScript } from '@/services/vertexService'
 import { revalidatePath } from 'next/cache'
 import { getUserRole, checkLimit } from '@/utils/checkLimit'
 import { isEnabled } from '@/config/features'
@@ -66,26 +66,39 @@ export async function generateAudio(documentId: string, mode: 'monologue' | 'con
         return { error: `Storage-Fehler: ${e.message}` }
     }
 
-    // ── 1. Podcast-Script via Gemini generieren ─────────────────────
+    // ── 1. Podcast-Skript via Vertex AI generieren ──────────────────
     let script: string
     try {
+        const promptBase = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
+        let fullPrompt = promptBase
+
         if (doc.type === 'COLLECTION') {
-            script = await generatePodcastScriptFromCollection(filesForGemini, doc.title, mode)
-        } else if (doc.type === 'PDF' || doc.type === 'IMAGE') {
-            script = await generatePodcastScriptFromFile(filesForGemini[0].buffer, filesForGemini[0].mimeType, filesForGemini[0].title, mode)
+            // Für Collections fassen wir die Metadaten zusammen (Text-only für Vertex v1)
+            fullPrompt += `\n\nSammlungstitel: "${doc.title}"`
+            // Hinweis: Vertex 1.5 Flash kann eigentlich Multimodal, aber für den Start nutzen wir Text.
+            // Falls wir Multimodal brauchen, müssten wir die Buffers an den Service übergeben.
+            fullPrompt += `\nInhalt: Bilder-Sammlung zu ${doc.title}`
         } else {
-            const raw = filesForGemini[0].buffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
-            script = await generatePodcastScriptFromText(raw, doc.title, mode)
+            fullPrompt += `\n\nDokumenttitel: "${doc.title}"`
+            if (doc.type === 'PDF' || doc.type === 'IMAGE') {
+                fullPrompt += `\nInhalt aus Datei: ${doc.title}`
+            } else {
+                const raw = filesForGemini[0].buffer.toString('utf-8').replace(/[^\x20-\x7E\u00C0-\u024F\n]/g, ' ')
+                fullPrompt += `\n\nInhalt:\n${raw.slice(0, 50000)}`
+            }
         }
+
+        const result = await generatePodcastScript(fullPrompt, documentId)
+        script = result.script
     } catch (e) {
-        return { error: `KI-Fehler (Script): ${e instanceof Error ? e.message : String(e)}` }
+        return { error: `Vertex-KI-Fehler (Script): ${e instanceof Error ? e.message : String(e)}` }
     }
     if (!script) return { error: 'Kein Podcast-Script generiert.' }
 
-    // ── 2. Script → WAV via Gemini TTS ─────────────────────────────
-    let wavBuffer: Buffer
+    // ── 2. Script → MP3 via Google Cloud TTS (Journey) ─────────────
+    let audioBuffer: Buffer
     try {
-        wavBuffer = await scriptToAudioBuffer(script)
+        audioBuffer = await generateHighQualityAudio(script, mode === 'conversation')
     } catch (e) {
         // Fallback: Script ohne Audio speichern (Player nutzt dann Script-Text)
         console.warn('TTS fehlgeschlagen, speichere nur Script:', e)
@@ -98,12 +111,12 @@ export async function generateAudio(documentId: string, mode: 'monologue' | 'con
         return { audioId: saved.id }
     }
 
-    // ── 3. WAV in Supabase Storage hochladen ────────────────────────
-    const audioPath = `${user.id}/${documentId}.wav`
+    // ── 3. MP3 in Supabase Storage hochladen (Sicher über RLS) ──────
+    const audioPath = `${user.id}/${documentId}.mp3`
     const { error: uploadErr } = await supabase.storage
         .from('audio-files')
-        .upload(audioPath, wavBuffer, {
-            contentType: 'audio/wav',
+        .upload(audioPath, audioBuffer, {
+            contentType: 'audio/mpeg',
             upsert: true,
         })
 
