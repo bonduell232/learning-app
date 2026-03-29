@@ -11,20 +11,17 @@ let aiInstance: GoogleGenAI | null = null;
 export function getAI() {
     if (aiInstance) return aiInstance;
 
-    const project = process.env.GOOGLE_CLOUD_PROJECT_ID;
-    const location = process.env.GOOGLE_CLOUD_REGION || 'europe-west3';
+    const apiKey = process.env.GOOGLE_CLOUD_API_KEY;
 
-    if (!project) {
-        throw new Error('GOOGLE_CLOUD_PROJECT_ID ist nicht konfiguriert.');
+    if (!apiKey) {
+        throw new Error('GOOGLE_CLOUD_API_KEY ist nicht konfiguriert.');
     }
 
-    // Authentifizierung erst hier beim ersten Aufruf initialisieren
+    // Wir rufen initGoogleAuth() weiterhin auf, um den Status-Log zu erhalten
     initGoogleAuth();
 
     aiInstance = new GoogleGenAI({
-        vertexai: true,
-        project: project,
-        location: location,
+        apiKey: apiKey
     });
 
     return aiInstance;

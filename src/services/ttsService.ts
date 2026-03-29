@@ -1,12 +1,8 @@
 import textToSpeech from '@google-cloud/text-to-speech';
-import { initGoogleAuth } from '@/utils/gcpAuth';
 
-initGoogleAuth();
-
-// Wenn lokale/WIF Credentials gesetzt sind, lesen wir diese aus wie bei Vertex.
-// ADC kümmert sich ansonsten von selbst um die Authentifizierung.
+// Wir nutzen nun den universellen API-Key für die Authentifizierung.
 const client = new textToSpeech.TextToSpeechClient({
-    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+    apiKey: process.env.GOOGLE_CLOUD_API_KEY,
 });
 
 /**
