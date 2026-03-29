@@ -108,18 +108,16 @@ export default async function DashboardLayout({
 
             {/* Bottom Nav (Mobile) */}
             <nav className="md:hidden fixed bottom-0 left-0 w-full bg-[#060406]/95 backdrop-blur-md border-t border-white/10 p-3 z-50 flex items-center justify-around pb-safe">
-                <Link href="/dashboard" className="flex flex-col items-center gap-1.5 p-2 text-white/70 hover:text-white transition-colors">
+                <Link href="/dashboard" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-white transition-colors">
                     <LayoutDashboard className="w-5 h-5" />
                     <span className="text-[10px] font-bold tracking-wide">Dashboard</span>
                 </Link>
-                <Link href="/upload" className="flex flex-col items-center gap-1.5 p-2 text-white/70 hover:text-white transition-colors">
-                    <div className="w-12 h-12 bg-[#9333EA] hover:bg-[#a855f7] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(147,51,234,0.4)] transition-all -mt-7 mb-0.5">
-                        <Upload className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-bold tracking-wide">Hochladen</span>
+                <Link href="/upload" className="flex flex-col items-center gap-1.5 p-2 transition-colors">
+                    <Upload className="w-5 h-5 text-[#A855F7] drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]" />
+                    <span className="text-[10px] font-bold tracking-wide text-[#A855F7]">Hochladen</span>
                 </Link>
                 <Link href="/impressum" className="flex flex-col items-center gap-1.5 p-2 text-white/50 hover:text-white transition-colors">
-                    <span className="text-xl h-5 leading-none">§</span>
+                    <span className="text-xl h-5 leading-none flex items-center justify-center">§</span>
                     <span className="text-[10px] font-bold tracking-wide">Legal</span>
                 </Link>
                 <form action={logout}>
