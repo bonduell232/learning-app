@@ -5,18 +5,31 @@ let authInitialized = false;
 export function initGoogleAuth() {
     if (authInitialized) return;
     
-    // ── Workload Identity Federation (WIF) Setup für Cloud (z.B. Vercel) ──
-    if (process.env.GCP_WIF_CONFIG && process.env.VERCEL_OIDC_TOKEN) {
+    // ── Workload Identity Federation (WIF) Setup für Vercel ──
+    const wifConfig = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+    const oidcToken = process.env.VERCEL_OIDC_TOKEN;
+    
+    if (wifConfig && oidcToken) {
         try {
-            if (!fs.existsSync('/tmp')) fs.mkdirSync('/tmp', { recursive: true });
+            const tempDir = '/tmp';
+            if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
             
-            fs.writeFileSync('/tmp/wif-config.json', process.env.GCP_WIF_CONFIG);
-            fs.writeFileSync('/tmp/oidc-token', process.env.VERCEL_OIDC_TOKEN);
+            // 1. Die WIF-Konfigurationsdatei schreiben
+            const configPath = `${tempDir}/gcp-credentials.json`;
+            fs.writeFileSync(configPath, wifConfig);
             
-            process.env.GOOGLE_APPLICATION_CREDENTIALS = '/tmp/wif-config.json';
+            // 2. Das Vercel-Identitäts-Token schreiben (wie im Cloud Portal definiert)
+            fs.writeFileSync(`${tempDir}/oidc-token`, oidcToken);
+            
+            // Google SDKs schauen automatisch in dieser Variable nach dem Pfad zur Config
+            process.env.GOOGLE_APPLICATION_CREDENTIALS = configPath;
+            console.log('✅ Google Cloud WIF Authentifizierung für Vercel initialisiert.');
         } catch (e) {
-            console.error('Fehler beim Setup der Cloud-Authentifizierung (WIF):', e);
+            console.error('❌ Fehler beim WIF Config Setup:', e);
         }
+    } else {
+        // Lokal (ADC): Falls kein WIF vollständig konfiguriert ist
+        console.log('ℹ️ Google Cloud nutzt lokale Authentifizierung (ADC).');
     }
 
     authInitialized = true;
