@@ -4,16 +4,31 @@ import { initGoogleAuth } from './gcpAuth';
 const project = process.env.GOOGLE_CLOUD_PROJECT_ID;
 const location = process.env.GOOGLE_CLOUD_REGION || 'europe-west3';
 
-// Authentifizierung aktivieren (WIF falls in Vercel, sonst lokal ADC)
-initGoogleAuth();
-
 // Authentifizierung über Application Default Credentials (ADC) lokal
 // oder die oben gesetzte WIF-Konfiguration in der Cloud.
-export const ai = new GoogleGenAI({
-    vertexai: true,
-    project: project || '',
-    location: location,
-});
+let aiInstance: GoogleGenAI | null = null;
+
+export function getAI() {
+    if (aiInstance) return aiInstance;
+
+    const project = process.env.GOOGLE_CLOUD_PROJECT_ID;
+    const location = process.env.GOOGLE_CLOUD_REGION || 'europe-west3';
+
+    if (!project) {
+        throw new Error('GOOGLE_CLOUD_PROJECT_ID ist nicht konfiguriert.');
+    }
+
+    // Authentifizierung erst hier beim ersten Aufruf initialisieren
+    initGoogleAuth();
+
+    aiInstance = new GoogleGenAI({
+        vertexai: true,
+        project: project,
+        location: location,
+    });
+
+    return aiInstance;
+}
 
 // Wir nutzen das Modell, das für dein Projekt offiziell verfügbar ist!
 export const MODEL_NAME = 'gemini-2.5-flash';

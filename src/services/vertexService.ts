@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { ai, MODEL_NAME, calculateEstimatedCost } from '@/utils/vertex';
+import { getAI, MODEL_NAME, calculateEstimatedCost } from '@/utils/vertex';
 
 export interface PodcastGenerationResponse {
     script: string;
@@ -17,7 +17,7 @@ export async function generatePodcastScript(prompt: string, documentId: string):
     if (!user) throw new Error('Nicht authentifiziert');
 
     // MIGRATION: Neues modernes SDK (ohne verschachtelte Content-Strukturen)
-    const result = await ai.models.generateContent({
+    const result = await getAI().models.generateContent({
         model: MODEL_NAME,
         contents: `${prompt}\n\nGanz wichtig: Falls der Text Sprach- oder Sonderzeichen enthält, wandle sie in gut lesbares Deutsch um.`,
         config: {

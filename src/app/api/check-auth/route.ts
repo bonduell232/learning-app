@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { initGoogleAuth } from '@/utils/gcpAuth';
 import tts from '@google-cloud/text-to-speech';
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { generatePodcastScript } from '@/services/vertexService';
 
 export async function POST(request: Request) {
