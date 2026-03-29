@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai'
+import { getAI, MODEL_NAME } from './vertex'
 
 export interface Flashcard {
     front: string
@@ -54,11 +54,7 @@ Regeln:
 - Antworte NUR mit einem validen JSON-Array im folgenden Format, ohne Erklärungen davor oder danach:
 [{"front": "Frage 1", "back": "Antwort 1"}, {"front": "Frage 2", "back": "Antwort 2"}]`
 
-function getClient(): GoogleGenAI {
-    const apiKey = process.env.NOTEBOOKLM_API_KEY
-    if (!apiKey) throw new Error('NOTEBOOKLM_API_KEY ist nicht gesetzt.')
-    return new GoogleGenAI({ apiKey })
-}
+
 
 function parseFlashcards(rawText: string): Flashcard[] {
     // JSON aus der Antwort extrahieren (falls Gemini etwas drumherum schreibt)
@@ -81,9 +77,9 @@ export async function generateFlashcardsFromText(
     text: string,
     title: string
 ): Promise<Flashcard[]> {
-    const client = getClient()
+    const client = getAI()
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [
             {
                 role: 'user',
@@ -106,11 +102,11 @@ export async function generateFlashcardsFromFile(
     mimeType: string,
     title: string
 ): Promise<Flashcard[]> {
-    const client = getClient()
+    const client = getAI()
     const base64Data = fileBuffer.toString('base64')
 
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [
             {
                 role: 'user',
@@ -162,11 +158,11 @@ export async function generatePodcastScriptFromFile(
     title: string,
     mode: 'monologue' | 'conversation' = 'monologue'
 ): Promise<string> {
-    const client = getClient()
+    const client = getAI()
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{
             role: 'user',
             parts: [
@@ -184,10 +180,10 @@ export async function generatePodcastScriptFromText(
     title: string,
     mode: 'monologue' | 'conversation' = 'monologue'
 ): Promise<string> {
-    const client = getClient()
+    const client = getAI()
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{
             role: 'user',
             parts: [
@@ -257,10 +253,10 @@ export async function generateQuizQuestionsFromFile(
     subject?: string,
     topic?: string
 ): Promise<QuizQuestion[]> {
-    const client = getClient()
+    const client = getAI()
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{
             role: 'user',
             parts: [
@@ -297,10 +293,10 @@ export async function detectSubjectAndTopicFromFile(
     mimeType: string,
     title: string
 ): Promise<SubjectDetection> {
-    const client = getClient()
+    const client = getAI()
     const base64Data = fileBuffer.toString('base64')
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{
             role: 'user', parts: [
                 { text: SUBJECT_DETECTION_PROMPT },
@@ -317,9 +313,9 @@ export async function detectSubjectAndTopicFromText(
     text: string,
     title: string
 ): Promise<SubjectDetection> {
-    const client = getClient()
+    const client = getAI()
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{
             role: 'user', parts: [
                 { text: SUBJECT_DETECTION_PROMPT },
@@ -336,9 +332,9 @@ export async function generateQuizQuestionsFromText(
     subject?: string,
     topic?: string
 ): Promise<QuizQuestion[]> {
-    const client = getClient()
+    const client = getAI()
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{
             role: 'user',
             parts: [
@@ -398,7 +394,7 @@ export function cleanScriptForTTS(text: string): string {
  * Erzeugt eine WAV-Audiodatei aus einem Podcast-Script via Gemini 2.0 Flash TTS.
  */
 export async function scriptToAudioBuffer(script: string): Promise<Buffer> {
-    const client = getClient()
+    const client = getAI()
 
     // Bereinige den Text für die Sprachausgabe
     const textToSpeak = cleanScriptForTTS(script)
@@ -411,7 +407,7 @@ export async function scriptToAudioBuffer(script: string): Promise<Buffer> {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await (client.models as any).generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{ parts: [{ text }] }],
         generationConfig: {
             responseModalities: ['AUDIO'],
@@ -469,7 +465,7 @@ export async function groupImagesByContext(
 ): Promise<ImageGroup[]> {
     if (!images.length) return [];
 
-    const client = getClient();
+    const client = getAI();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parts: any[] = [{ text: GROUPING_PROMPT }];
@@ -485,7 +481,7 @@ export async function groupImagesByContext(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{ role: 'user', parts }]
     });
 
@@ -508,7 +504,7 @@ export async function generateFlashcardsFromCollection(
     files: { buffer: Buffer; mimeType: string; title: string }[],
     collectionTitle: string
 ): Promise<Flashcard[]> {
-    const client = getClient();
+    const client = getAI();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parts: any[] = [
         { text: SYSTEM_PROMPT },
@@ -520,7 +516,7 @@ export async function generateFlashcardsFromCollection(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{ role: 'user', parts }]
     });
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
@@ -532,7 +528,7 @@ export async function generatePodcastScriptFromCollection(
     collectionTitle: string,
     mode: 'monologue' | 'conversation' = 'monologue'
 ): Promise<string> {
-    const client = getClient();
+    const client = getAI();
     const prompt = mode === 'conversation' ? PODCAST_DIALOG_PROMPT : PODCAST_PROMPT
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parts: any[] = [
@@ -545,7 +541,7 @@ export async function generatePodcastScriptFromCollection(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{ role: 'user', parts }]
     });
     return response.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
@@ -557,7 +553,7 @@ export async function generateQuizQuestionsFromCollection(
     subject?: string,
     topic?: string
 ): Promise<QuizQuestion[]> {
-    const client = getClient();
+    const client = getAI();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parts: any[] = [
         { text: getQuizPrompt(subject, topic) },
@@ -569,7 +565,7 @@ export async function generateQuizQuestionsFromCollection(
     });
 
     const response = await client.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: MODEL_NAME,
         contents: [{ role: 'user', parts }]
     });
     const raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';

@@ -1,5 +1,4 @@
 import { GoogleGenAI } from '@google/genai';
-import { initGoogleAuth } from './gcpAuth';
 
 const project = process.env.GOOGLE_CLOUD_PROJECT_ID;
 const location = process.env.GOOGLE_CLOUD_REGION || 'europe-west3';
@@ -17,8 +16,7 @@ export function getAI() {
         throw new Error('GOOGLE_CLOUD_API_KEY ist nicht konfiguriert.');
     }
 
-    // Wir rufen initGoogleAuth() weiterhin auf, um den Status-Log zu erhalten
-    initGoogleAuth();
+    console.log('✅ Google AI Client: Initialisiere mit API-Key-Authentifizierung.');
 
     aiInstance = new GoogleGenAI({
         apiKey: apiKey
