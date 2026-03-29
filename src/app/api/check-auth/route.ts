@@ -10,8 +10,10 @@ export async function GET() {
     // Initialisiere die Authentifizierung (WIF / ADC)
     initGoogleAuth();
     
-    // Teste die Verbindung durch Abruf der Stimmenliste
-    const client = new tts.TextToSpeechClient();
+    // Teste die Verbindung durch Abruf der Stimmenliste mit dem API-Key
+    const client = new tts.TextToSpeechClient({
+      apiKey: process.env.GOOGLE_CLOUD_API_KEY
+    });
     const [response] = await client.listVoices({});
     
     const debugInfo = {
